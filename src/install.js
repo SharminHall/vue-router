@@ -9,23 +9,28 @@ export function install (Vue) {
 
   _Vue = Vue
 
-  const isDef = v => v !== undefined
+  const isDef = v => v !== undefined // 检测是否未定义
 
   const registerInstance = (vm, callVal) => {
     let i = vm.$options._parentVnode
+
+    // 等同于检测i.data.registerRouteInstance是否存在
     if (isDef(i) && isDef(i = i.data) && isDef(i = i.registerRouteInstance)) {
       i(vm, callVal)
     }
   }
 
+  // 全局混入
   Vue.mixin({
     beforeCreate () {
+      // router是否存在，this指向新建vue组件实例
       if (isDef(this.$options.router)) {
         this._routerRoot = this
         this._router = this.$options.router
         this._router.init(this)
         Vue.util.defineReactive(this, '_route', this._router.history.current)
       } else {
+        // 子组件的_routerRoot指向注册的顶层组件
         this._routerRoot = (this.$parent && this.$parent._routerRoot) || this
       }
       registerInstance(this, this)
@@ -43,6 +48,7 @@ export function install (Vue) {
     get () { return this._routerRoot._route }
   })
 
+  // 注册rooter-view和router-link
   Vue.component('RouterView', View)
   Vue.component('RouterLink', Link)
 
