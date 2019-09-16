@@ -17,8 +17,13 @@ export function createMatcher (
   routes: Array<RouteConfig>,
   router: VueRouter
 ): Matcher {
+  // createRouteMap生成以下：
+  // pathList 所有路由路径集合
+  // pathMap 根据路径映射对应路由信息的map对象
+  // nameMap 根据路由名称映射对应路由信息的map对象
   const { pathList, pathMap, nameMap } = createRouteMap(routes)
 
+  // 动态增加路由的方法
   function addRoutes (routes) {
     createRouteMap(routes, pathList, pathMap, nameMap)
   }

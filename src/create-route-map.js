@@ -121,6 +121,8 @@ function addRouteRecord (
         )
       }
     }
+
+    // 递归收集路由信息
     route.children.forEach(child => {
       const childMatchAs = matchAs
         ? cleanPath(`${matchAs}/${child.path}`)
@@ -130,8 +132,8 @@ function addRouteRecord (
   }
 
   if (!pathMap[record.path]) {
-    pathList.push(record.path)
-    pathMap[record.path] = record
+    pathList.push(record.path) // pathList 所有路由路径集合
+    pathMap[record.path] = record // pathMap 根据路径映射对应路由信息的map对象
   }
 
   if (route.alias !== undefined) {
@@ -163,8 +165,9 @@ function addRouteRecord (
   }
 
   if (name) {
+    // nameMap 根据路由名称映射对应路由信息的map对象
     if (!nameMap[name]) {
-      nameMap[name] = record
+      nameMap[name] = record 
     } else if (process.env.NODE_ENV !== 'production' && !matchAs) {
       warn(
         false,
@@ -193,6 +196,7 @@ function compileRouteRegex (
   return regex
 }
 
+// 格式化路径，开头有'/'，结尾去掉'/'
 function normalizePath (
   path: string,
   parent?: RouteRecord,

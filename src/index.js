@@ -233,6 +233,7 @@ export default class VueRouter {
     }
   }
 
+  // 动态路由添加方法
   addRoutes (routes: Array<RouteConfig>) {
     this.matcher.addRoutes(routes)
     if (this.history.current !== START) {
