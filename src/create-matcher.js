@@ -50,6 +50,7 @@ export function createMatcher (
         location.params = {}
       }
 
+      // merge currentRoute.params in paramNames but not in location.params
       if (currentRoute && typeof currentRoute.params === 'object') {
         for (const key in currentRoute.params) {
           if (!(key in location.params) && paramNames.indexOf(key) > -1) {

@@ -34,6 +34,8 @@ export function resolveQuery (
   return parsedQuery
 }
 
+// 将路径参数转为Obj类型
+// 例子：'?a=1&b=2&b=3&b=4' => { a: 1, b: [2, 3, 4] }
 function parseQuery (query: string): Dictionary<string> {
   const res = {}
 
@@ -62,6 +64,8 @@ function parseQuery (query: string): Dictionary<string> {
   return res
 }
 
+// 将Obj类型参数转为路径参数
+// 例子：{ a: 1, b: [2, 3, 4] } => '?a=1&b=2&b=3&b=4'
 export function stringifyQuery (obj: Dictionary<string>): string {
   const res = obj ? Object.keys(obj).map(key => {
     const val = obj[key]

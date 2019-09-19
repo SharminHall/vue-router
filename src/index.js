@@ -41,7 +41,9 @@ export default class VueRouter {
     this.afterHooks = []
     this.matcher = createMatcher(options.routes || [], this)
 
+    // 路由模式处理
     let mode = options.mode || 'hash'
+    // 当浏览器不支持history api
     this.fallback = mode === 'history' && !supportsPushState && options.fallback !== false
     if (this.fallback) {
       mode = 'hash'
@@ -242,6 +244,7 @@ export default class VueRouter {
   }
 }
 
+// 注册钩子，向list中增加一个函数fn，返回一个unregister该函数(fn)的方法
 function registerHook (list: Array<any>, fn: Function): Function {
   list.push(fn)
   return () => {

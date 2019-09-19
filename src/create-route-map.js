@@ -183,6 +183,8 @@ function compileRouteRegex (
   pathToRegexpOptions: PathToRegexpOptions
 ): RouteRegExp {
   const regex = Regexp(path, [], pathToRegexpOptions)
+
+  // 校验是否有重复的key
   if (process.env.NODE_ENV !== 'production') {
     const keys: any = Object.create(null)
     regex.keys.forEach(key => {

@@ -216,7 +216,9 @@ function normalizeBase (base: ?string): string {
       // respect <base> tag
       const baseEl = document.querySelector('base')
       base = (baseEl && baseEl.getAttribute('href')) || '/'
+
       // strip full URL origin
+      // 去掉协议头和域名
       base = base.replace(/^https?:\/\/[^\/]+/, '')
     } else {
       base = '/'
@@ -226,7 +228,7 @@ function normalizeBase (base: ?string): string {
   if (base.charAt(0) !== '/') {
     base = '/' + base
   }
-  // remove trailing slash
+  // remove trailing slash 去掉尾部斜线
   return base.replace(/\/$/, '')
 }
 
