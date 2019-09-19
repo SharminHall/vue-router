@@ -87,7 +87,7 @@ function addRouteRecord (
     instances: {},
     name,
     parent,
-    matchAs,
+    matchAs, // 设置了alias之后的path别名，会影响所有子路由
     redirect: route.redirect,
     beforeEnter: route.beforeEnter,
     meta: route.meta || {},
@@ -136,6 +136,7 @@ function addRouteRecord (
     pathMap[record.path] = record // pathMap 根据路径映射对应路由信息的map对象
   }
 
+  // 如果该路由具备别名，将以别名映射该路由pathMap
   if (route.alias !== undefined) {
     const aliases = Array.isArray(route.alias) ? route.alias : [route.alias]
     for (let i = 0; i < aliases.length; ++i) {
@@ -182,9 +183,10 @@ function compileRouteRegex (
   path: string,
   pathToRegexpOptions: PathToRegexpOptions
 ): RouteRegExp {
+  // 获取定义的路径参数
   const regex = Regexp(path, [], pathToRegexpOptions)
 
-  // 校验是否有重复的key
+  // 例：keys = [{ name: '', prefix: '/', delimiter: '/', optional: false, repeat: false, pattern: '' }]
   if (process.env.NODE_ENV !== 'production') {
     const keys: any = Object.create(null)
     regex.keys.forEach(key => {
