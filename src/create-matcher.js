@@ -75,6 +75,7 @@ export function createMatcher (
     return _createRoute(null, location)
   }
 
+  // 当路由设置了redirect，返回该路由重定向指向的路由信息
   function redirect (
     record: RouteRecord,
     location: Location
@@ -137,6 +138,7 @@ export function createMatcher (
     }
   }
 
+  // 当路由设置了alias，通过别名返回该路由信息
   function alias (
     record: RouteRecord,
     location: Location,

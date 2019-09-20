@@ -67,6 +67,7 @@ export class History {
     onComplete?: Function,
     onAbort?: Function
   ) {
+    // 获取目标路由信息
     const route = this.router.match(location, this.current)
     this.confirmTransition(
       route,
@@ -116,6 +117,8 @@ export class History {
       }
       onAbort && onAbort(err)
     }
+
+    // 相同url+参数
     if (
       isSameRoute(route, current) &&
       // in the case the route map has been dynamically appended to
