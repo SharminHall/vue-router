@@ -28,6 +28,7 @@ export class HashHistory extends History {
       setupScroll()
     }
 
+    // 监听路由发生变化
     window.addEventListener(
       supportsPushState ? 'popstate' : 'hashchange',
       () => {

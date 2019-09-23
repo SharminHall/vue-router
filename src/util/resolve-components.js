@@ -69,14 +69,20 @@ export function resolveAsyncComponents (matched: Array<RouteRecord>): Function {
   }
 }
 
+/**
+ * 抽取matched中的components，转化成参数传入fn中，返回扁平化后的fn执行的返回结果
+ * @param {*} matched 
+ * @param {*} fn 
+ */
 export function flatMapComponents (
   matched: Array<RouteRecord>,
   fn: Function
 ): Array<?Function> {
   return flatten(matched.map(m => {
+    // 值components: route.components || { default: route.component }
     return Object.keys(m.components).map(key => fn(
       m.components[key],
-      m.instances[key],
+      m.instances[key], // router-view中registerRouteInstance时，赋值的目标组件实例
       m, key
     ))
   }))

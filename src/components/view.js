@@ -25,6 +25,8 @@ export default {
     // has been toggled inactive but kept-alive.
     let depth = 0
     let inactive = false
+
+    // 向上寻找app顶层注册组件，同时计算该rooter-view的深度，且确认是否包含在keep-alive组件中，状态为inactive
     while (parent && parent._routerRoot !== parent) {
       const vnodeData = parent.$vnode && parent.$vnode.data
       if (vnodeData) {
@@ -37,7 +39,7 @@ export default {
       }
       parent = parent.$parent
     }
-    data.routerViewDepth = depth
+    data.routerViewDepth = depth // depth存储在data中
 
     // render previous view if the tree is inactive and kept-alive
     if (inactive) {
@@ -51,10 +53,13 @@ export default {
       return h()
     }
 
+    // 通过name取得对应组件，name默认default
     const component = cache[name] = matched.components[name]
 
     // attach instance registration hook
     // this will be called in the instance's injected lifecycle hooks
+    // 声明路由注册实例函数，install时，全局混入在组件生命周期beforeCreate，如果是rooter-view对应组件会调用
+    // 该实例是为了组件内部的beforeRouteEnter的next回调函数入参值
     data.registerRouteInstance = (vm, val) => {
       // val could be undefined for unregistration
       const current = matched.instances[name]

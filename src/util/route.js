@@ -53,6 +53,7 @@ export const START = createRoute(null, {
   path: '/'
 })
 
+// 生成当前record往上追溯的路径数组
 function formatMatch (record: ?RouteRecord): Array<RouteRecord> {
   const res = []
   while (record) {

@@ -74,10 +74,11 @@ export class History {
       () => {
         this.updateRoute(route)
         onComplete && onComplete(route)
-        this.ensureURL()
+        this.ensureURL() // 改变url
 
         // fire ready cbs once
         if (!this.ready) {
+          // 路由导航完毕的回调
           this.ready = true
           this.readyCbs.forEach(cb => {
             cb(route)
@@ -90,6 +91,7 @@ export class History {
         }
         if (err && !this.ready) {
           this.ready = true
+          // 路由导航失败的回调
           this.readyErrorCbs.forEach(cb => {
             cb(err)
           })
@@ -118,7 +120,7 @@ export class History {
       onAbort && onAbort(err)
     }
 
-    // 相同url+参数
+    // 真实路由（带参）未发生变化
     if (
       isSameRoute(route, current) &&
       // in the case the route map has been dynamically appended to
@@ -128,6 +130,10 @@ export class History {
       return abort(new NavigationDuplicated(route))
     }
 
+    // 比对当前路由栈和预跳转路由栈
+    // updated（共存的祖先路由栈）
+    // deactivated（将失效的所有路由组件列表）
+    // activated（将激活的所有路由组件列表）
     const { updated, deactivated, activated } = resolveQueue(
       this.current.matched,
       route.matched
@@ -135,23 +141,30 @@ export class History {
 
     const queue: Array<?NavigationGuard> = [].concat(
       // in-component leave guards
+      // 获取所有失活组件的beforeRouteLeave路由守卫钩子
       extractLeaveGuards(deactivated),
-      // global before hooks
+      // 全局守卫钩子
       this.router.beforeHooks,
-      // in-component update hooks
+      // 获取所有更新组件的 beforeRouteUpdate路由守卫钩子
       extractUpdateHooks(updated),
-      // in-config enter guards
+      // 获取待激活组件路由配置上直接定义的beforeEnter守卫
       activated.map(m => m.beforeEnter),
-      // async components
+      // 加载所有待激活的异步组件
       resolveAsyncComponents(activated)
     )
 
     this.pending = route
+    // 存储的待执行的路由守卫队列的迭代器
     const iterator = (hook: NavigationGuard, next) => {
       if (this.pending !== route) {
         return abort()
       }
       try {
+        // 调用路由守卫，实参与形参对应关系：
+        // router 即to
+        // current 即from
+        // (to) => {} 即除了组件内的beforeRouteEnter以外，都是对应next。
+        // beforeRouteEnter在调用时会额外的处理回调，该回调即next(vm => {})
         hook(route, current, (to: any) => {
           if (to === false || isError(to)) {
             // next(false) -> abort navigation, ensure current URL
@@ -179,12 +192,17 @@ export class History {
       }
     }
 
+    // 队列执行函数，第三个参数即全部执行完毕的回调函数callback
     runQueue(queue, iterator, () => {
+      // 
+      // postEnterCbs所有存储待激活组件内beforeRouteEnter注册的回调函数
       const postEnterCbs = []
       const isValid = () => this.current === route
       // wait until async components are resolved before
       // extracting in-component enter guards
+      // 收集待激活组件内部的beforeRouteEnter
       const enterGuards = extractEnterGuards(activated, postEnterCbs, isValid)
+      // 最后全局守护beforeResolve 
       const queue = enterGuards.concat(this.router.resolveHooks)
       runQueue(queue, iterator, () => {
         if (this.pending !== route) {
@@ -207,6 +225,7 @@ export class History {
     const prev = this.current
     this.current = route
     this.cb && this.cb(route)
+    // 全局守卫afterEach
     this.router.afterHooks.forEach(hook => {
       hook && hook(route, prev)
     })
@@ -263,9 +282,13 @@ function extractGuards (
   bind: Function,
   reverse?: boolean
 ): Array<?Function> {
+  // flatMapComponents抽取records，guards为其第二个参数执行后的返回值，类型Array<?Function>
   const guards = flatMapComponents(records, (def, instance, match, key) => {
-    const guard = extractGuard(def, name)
+    // def: component, instance: 组件实例, match: 路由信息, key: component的key，默认default
+    const guard = extractGuard(def, name) // 获取对应name的路由守卫
     if (guard) {
+      // 该守卫可为Array<Function>类型
+      // 返回bind函数执行结果
       return Array.isArray(guard)
         ? guard.map(guard => bind(guard, instance, match, key))
         : bind(guard, instance, match, key)
@@ -293,6 +316,7 @@ function extractUpdateHooks (updated: Array<RouteRecord>): Array<?Function> {
   return extractGuards(updated, 'beforeRouteUpdate', bindGuard)
 }
 
+// bind 确保调用路由守卫guard时，this指向该路由守卫所在组件的实例
 function bindGuard (guard: NavigationGuard, instance: ?_Vue): ?NavigationGuard {
   if (instance) {
     return function boundRouteGuard () {
@@ -301,6 +325,13 @@ function bindGuard (guard: NavigationGuard, instance: ?_Vue): ?NavigationGuard {
   }
 }
 
+/**
+ * 收集组件内部路由守卫beforeRouteEnter
+ * 最后得到函数bindEnterGuard返回的routeEnterGuard
+ * @param {*} activated 
+ * @param {*} cbs 
+ * @param {*} isValid 
+ */
 function extractEnterGuards (
   activated: Array<RouteRecord>,
   cbs: Array<Function>,
@@ -322,9 +353,11 @@ function bindEnterGuard (
   cbs: Array<Function>,
   isValid: () => boolean
 ): NavigationGuard {
+  // 返回enter hook，迭代器iterator中将会调用该函数
   return function routeEnterGuard (to, from, next) {
     return guard(to, from, cb => {
       if (typeof cb === 'function') {
+        // 向回调数组中添加回调函数，即上面的postEnterCbs
         cbs.push(() => {
           // #750
           // if a router-view is wrapped with an out-in transition,
@@ -349,7 +382,7 @@ function poll (
     instances[key] &&
     !instances[key]._isBeingDestroyed // do not reuse being destroyed instance
   ) {
-    cb(instances[key])
+    cb(instances[key]) // 传入组件实例 同使用时：next(vm => {})
   } else if (isValid()) {
     setTimeout(() => {
       poll(cb, instances, key, isValid)

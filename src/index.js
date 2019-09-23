@@ -112,9 +112,11 @@ export default class VueRouter {
 
     const history = this.history
 
+    // transitionTo 促使路由变化的函数
     if (history instanceof HTML5History) {
       history.transitionTo(history.getCurrentLocation())
     } else if (history instanceof HashHistory) {
+      // hash模式下的监听器
       const setupHashListener = () => {
         history.setupListeners()
       }
@@ -125,6 +127,7 @@ export default class VueRouter {
       )
     }
 
+    // 路由发生变化，挂载的app组件上的路由跟随变化
     history.listen(route => {
       this.apps.forEach((app) => {
         app._route = route
