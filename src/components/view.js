@@ -53,13 +53,13 @@ export default {
       return h()
     }
 
-    // 通过name取得对应组件，name默认default
+    // 通过name取得对应组件，name默认default，存储在cache中用于keep-alive激活
     const component = cache[name] = matched.components[name]
 
     // attach instance registration hook
     // this will be called in the instance's injected lifecycle hooks
-    // 声明路由注册实例函数，install时，全局混入在组件生命周期beforeCreate，如果是rooter-view对应组件会调用
-    // 该实例是为了组件内部的beforeRouteEnter的next回调函数入参值
+    // 声明路由注册实例函数，install时，全局混入在组件生命周期beforeCreate，如果是rooter-view对应组件将会调用
+    // 该实例instances是用于组件内部的beforeRouteEnter的next回调函数入参值
     data.registerRouteInstance = (vm, val) => {
       // val could be undefined for unregistration
       const current = matched.instances[name]
@@ -73,12 +73,14 @@ export default {
 
     // also register instance in prepatch hook
     // in case the same component instance is reused across different routes
+    // 同一组件在不同的路由中重用，则可以用该方法在路由信息上注册实例
     ;(data.hook || (data.hook = {})).prepatch = (_, vnode) => {
       matched.instances[name] = vnode.componentInstance
     }
 
     // register instance in init hook
     // in case kept-alive component be actived when routes changed
+    // 当路由变化时，调用该函数，使keep-alive包含的组件失活
     data.hook.init = (vnode) => {
       if (vnode.data.keepAlive &&
         vnode.componentInstance &&
