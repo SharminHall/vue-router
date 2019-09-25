@@ -82,16 +82,16 @@ function addRouteRecord (
 
   const record: RouteRecord = {
     path: normalizedPath,
-    regex: compileRouteRegex(normalizedPath, pathToRegexpOptions),
+    regex: compileRouteRegex(normalizedPath, pathToRegexpOptions), // 路由路径匹配规则
     components: route.components || { default: route.component },
-    instances: {},
+    instances: {}, // 存储加载的组件实例
     name,
     parent,
     matchAs, // 设置了alias之后的path别名，会影响所有子路由
     redirect: route.redirect,
-    beforeEnter: route.beforeEnter,
+    beforeEnter: route.beforeEnter, // 路由独享的守卫
     meta: route.meta || {},
-    props:
+    props: // 通过 props 解耦 boolean | object
       route.props == null
         ? {}
         : route.components
