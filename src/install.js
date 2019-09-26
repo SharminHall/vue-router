@@ -25,7 +25,7 @@ export function install (Vue) {
   // 全局混入
   Vue.mixin({
     beforeCreate () {
-      // router是否存在，this指向新建vue组件实例
+      // router是否存在,如果存在，即为app组件
       if (isDef(this.$options.router)) {
         // 存储注册router的根组件实例
         this._routerRoot = this
@@ -34,7 +34,7 @@ export function install (Vue) {
         this._router = this.$options.router
         this._router.init(this)
 
-        // 使this._route成为响应式数据
+        // 给this._route赋值当前路由，并reactive化，当发生变化时，将引起组件重绘
         Vue.util.defineReactive(this, '_route', this._router.history.current)
       } else {
         // 子组件的_routerRoot指向注册rooter的顶层组件

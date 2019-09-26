@@ -127,7 +127,7 @@ export default class VueRouter {
       )
     }
 
-    // 路由发生变化，挂载的app组件上的路由跟随变化
+    // listen注册路由发生变化之后，会调用的回调函数
     history.listen(route => {
       this.apps.forEach((app) => {
         app._route = route
