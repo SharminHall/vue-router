@@ -22,6 +22,7 @@ export function normalizeLocation (
   }
 
   // relative params
+  // 不存在path，但纯如了params，则继承current的路由信息，且合并params
   if (!next.path && next.params && current) {
     next = extend({}, next)
     next._normalized = true
@@ -38,6 +39,7 @@ export function normalizeLocation (
     return next
   }
 
+  // 分离path，返回{ path, query, hash }
   const parsedPath = parsePath(next.path || '')
   const basePath = (current && current.path) || '/'
   const path = parsedPath.path

@@ -76,6 +76,7 @@ function addRouteRecord (
     route.pathToRegexpOptions || {}
   const normalizedPath = normalizePath(path, parent, pathToRegexpOptions.strict)
 
+  // 匹配时，大小写是否敏感
   if (typeof route.caseSensitive === 'boolean') {
     pathToRegexpOptions.sensitive = route.caseSensitive
   }
@@ -87,7 +88,9 @@ function addRouteRecord (
     instances: {}, // 存储加载的组件实例
     name,
     parent,
-    matchAs, // 设置了alias之后的path别名，会影响所有子路由
+    // 设置了alias之后的path别名，影响所有子路由都会存在该值
+    // 例入{ alias: '/a2', path: '/a', children: [{ path: '/b', matchAs: '/a/b }] }
+    matchAs,
     redirect: route.redirect,
     beforeEnter: route.beforeEnter, // 路由独享的守卫
     meta: route.meta || {},

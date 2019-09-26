@@ -42,6 +42,8 @@ export function createMatcher (
         warn(record, `Route with name '${name}' does not exist`)
       }
       if (!record) return _createRoute(null, location)
+
+      // 取出path中的路由参数key值
       const paramNames = record.regex.keys
         .filter(key => !key.optional)
         .map(key => key.name)
@@ -50,7 +52,7 @@ export function createMatcher (
         location.params = {}
       }
 
-      // merge currentRoute.params in paramNames but not in location.params
+      // 合并当前路由参数至目标路由参数中，前提：当前路由参数在paramNames中，且目标路由参数中不存在
       if (currentRoute && typeof currentRoute.params === 'object') {
         for (const key in currentRoute.params) {
           if (!(key in location.params) && paramNames.indexOf(key) > -1) {
@@ -59,6 +61,7 @@ export function createMatcher (
         }
       }
 
+      // 将参数合入path中，比如path为/user/:id，id为1，则返回填充过参数的路径/user/1
       location.path = fillParams(record.path, location.params, `named route "${name}"`)
       return _createRoute(record, location, redirectedFrom)
     } else if (location.path) {
@@ -67,6 +70,7 @@ export function createMatcher (
       for (let i = 0; i < pathList.length; i++) {
         const path = pathList[i]
         const record = pathMap[path]
+        // 判断当前路径是否匹配，同时赋值参数
         if (matchRoute(record.regex, location.path, location.params)) {
           return _createRoute(record, location, redirectedFrom)
         }
