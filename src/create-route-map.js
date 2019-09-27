@@ -139,7 +139,7 @@ function addRouteRecord (
     pathMap[record.path] = record // pathMap 根据路径映射对应路由信息的map对象
   }
 
-  // 如果该路由具备别名，将以别名映射该路由pathMap
+  // 如果该路由具备别名，则其子路由的将以该别名生成一条分支树
   if (route.alias !== undefined) {
     const aliases = Array.isArray(route.alias) ? route.alias : [route.alias]
     for (let i = 0; i < aliases.length; ++i) {

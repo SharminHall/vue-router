@@ -155,6 +155,7 @@ export function createMatcher (
       path: aliasedPath
     })
     if (aliasedMatch) {
+      // 当前路由栈
       const matched = aliasedMatch.matched
       const aliasedRecord = matched[matched.length - 1]
       location.params = aliasedMatch.params

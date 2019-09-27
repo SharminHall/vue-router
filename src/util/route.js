@@ -11,6 +11,7 @@ export function createRoute (
   redirectedFrom?: ?Location,
   router?: VueRouter
 ): Route {
+  // location.query路由参数附加在path中的处理函数，未设置则会调用默认处理函数
   const stringifyQuery = router && router.options.stringifyQuery
 
   let query: any = location.query || {}
@@ -26,7 +27,7 @@ export function createRoute (
     query,
     params: location.params || {},
     fullPath: getFullPath(location, stringifyQuery),
-    matched: record ? formatMatch(record) : []
+    matched: record ? formatMatch(record) : [] // 存储当前路由节点到顶层的路由栈
   }
   if (redirectedFrom) {
     route.redirectedFrom = getFullPath(redirectedFrom, stringifyQuery)
