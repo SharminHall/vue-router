@@ -194,7 +194,6 @@ export class History {
 
     // 队列执行函数，第三个参数即全部执行完毕的回调函数callback
     runQueue(queue, iterator, () => {
-      // 
       // postEnterCbs所有存储待激活组件内beforeRouteEnter注册的回调函数
       const postEnterCbs = []
       const isValid = () => this.current === route

@@ -35,12 +35,15 @@ export default {
   render (h: Function) {
     const router = this.$router
     const current = this.$route
+
+    // 目标路由信息
     const { location, route, href } = router.resolve(
       this.to,
       current,
       this.append
     )
 
+    // 一大堆class名的处理
     const classes = {}
     const globalActiveClass = router.options.linkActiveClass
     const globalExactActiveClass = router.options.linkExactActiveClass
@@ -58,6 +61,7 @@ export default {
         ? exactActiveClassFallback
         : this.exactActiveClass
 
+    // 如果该路由为重定向路由
     const compareTarget = route.redirectedFrom
       ? createRoute(null, normalizeLocation(route.redirectedFrom), null, router)
       : route
@@ -67,6 +71,7 @@ export default {
       ? classes[exactActiveClass]
       : isIncludedRoute(current, compareTarget)
 
+    // 点击事件
     const handler = e => {
       if (guardEvent(e)) {
         if (this.replace) {
@@ -77,6 +82,7 @@ export default {
       }
     }
 
+    // 注册点击事件
     const on = { click: guardEvent }
     if (Array.isArray(this.event)) {
       this.event.forEach(e => {
@@ -88,6 +94,7 @@ export default {
 
     const data: any = { class: classes }
 
+    // 插槽渲染
     const scopedSlot =
       !this.$scopedSlots.$hasNormal &&
       this.$scopedSlots.default &&
@@ -115,25 +122,28 @@ export default {
       }
     }
 
+    // a标签
     if (this.tag === 'a') {
       data.on = on
       data.attrs = { href }
     } else {
-      // find the first <a> child and apply listener and href
+      // 在插槽中查找a标签，并添加click事件和href路径属性
       const a = findAnchor(this.$slots.default)
       if (a) {
         // in case the <a> is a static node
         a.isStatic = false
         const aData = (a.data = extend({}, a.data))
         aData.on = aData.on || {}
-        // transform existing events in both objects into arrays so we can push later
+
+        // 原生存在和on中同样事件时，将原生事件转换成数组Array<Event>
         for (const event in aData.on) {
           const handler = aData.on[event]
           if (event in on) {
             aData.on[event] = Array.isArray(handler) ? handler : [handler]
           }
         }
-        // append new listeners for router-link
+
+        // 再将on中的事件附加到原生事件中
         for (const event in on) {
           if (event in aData.on) {
             // on[event] is always a function
